@@ -2,6 +2,7 @@ package io.ipfs.multiformats.multihash
 
 import org.apache.commons.codec.binary.Hex
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -12,11 +13,12 @@ import org.junit.Test
  */
 class MultihashTest {
 
-    private lateinit var testCases: Map<String, Multihash.Type>
+    private lateinit var hexHash: Map<String, Multihash.Type>
+    private lateinit var base58Hash: Map<String, Multihash.Type>
 
     @Before
     fun setUp() {
-        testCases = hashMapOf(
+        hexHash = hashMapOf(
                 "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7aeff" to Multihash.Type.ID,
 //                "" to Multihash.Type.ID,
                 "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" to Multihash.Type.SHA1,
@@ -30,6 +32,10 @@ class MultihashTest {
                 "1af97f7818a28edfdfce5ec66dbdc7e871813816d7d585fe1f12475ded5b6502b7723b74e2ee36f2651a10a8eaca72aa9148c3c761aaceac8f6d6cc64381ed39" to Multihash.Type.SHAKE_256,
                 "4bca2b137edc580fe50a88983ef860ebaca36c857b1f492839d6d7392452a63c82cbebc68e3b70a2a1480b4bb5d437a7cba6ecf9d89f9ff3ccd14cd6146ea7e7" to Multihash.Type.SHA3_512
         )
+        base58Hash = hashMapOf(
+                "5dsgvJGnvAfiR3K6HCBc4hcokSfmjj" to Multihash.Type.SHA1,
+                "QmYtUc4iTCbbfVSDNKvtQqrfyezPPnFvE33wFmutw9PBBk" to Multihash.Type.SHA2_256
+        )
     }
 
     @After
@@ -38,7 +44,7 @@ class MultihashTest {
 
     @Test
     fun toHex() {
-        testCases.forEach { hash, type ->
+        hexHash.forEach { hash, type ->
             val multihash = Multihash(type, hash = Hex.decodeHex(hash))
             val hex = multihash.toHex()
             println("${type.name}.hex=$hex")
@@ -55,13 +61,16 @@ class MultihashTest {
 //        val decode = BaseN.decode(MultiBase.Base.BASE58_BTC.alphabet, BigInteger("58"), "5dsgvJGnvAfiR3K6HCBc4hcokSfmjj")
 //        val encode = BaseN.encode(MultiBase.Base.BASE58_BTC.alphabet, BigInteger("58"), toBytes())
 //
-        val mh = Multihash.fromBase58("5dsgvJGnvAfiR3K6HCBc4hcokSfmjj")
-////        println("encode=$encode")
-        println("mh.type=${mh.type}, mh.hash=${mh.hash.size}")
+        base58Hash.forEach { hash, type ->
+            val mh = Multihash.fromBase58(hash)
+            println("mh.type=${mh.type}, mh.hash.size=${mh.hash.size}")
+            Assert.assertEquals(type.code, mh.type.code)
+            Assert.assertEquals(type.length, mh.type.length)
+        }
     }
 
     private fun toBytes(): ByteArray {
-        val result = ByteArray("multihash".toByteArray().size  + 2)
+        val result = ByteArray("multihash".toByteArray().size + 2)
         result[0] = 0x11
         result[1] = 20
         System.arraycopy("multihash".toByteArray(), 0, result, 2, "multihash".toByteArray().size)
@@ -69,7 +78,7 @@ class MultihashTest {
     }
 
     @Test
-    fun toBase64(){
+    fun toBase64() {
         val hash = Multihash.fromBase64("EiCcvAfD+ZFyWDajqipYHKICkZiqQgudmbwOEx2fPiy+Rw==")
         println("hash.type=${hash.type}")
     }
