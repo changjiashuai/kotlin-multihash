@@ -10,7 +10,7 @@
 
 ## Install
 
-Add the relevant dependency to your project:(WIP)
+Add the relevant dependency to your project:
 
 #### Maven
 
@@ -18,7 +18,7 @@ Add the relevant dependency to your project:(WIP)
 <dependency>
   <groupId>io.ipfs.multiformats</groupId>
   <artifactId>kotlin-multihash</artifactId>
-  <version>......</version>
+  <version>1.0.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -26,7 +26,7 @@ Add the relevant dependency to your project:(WIP)
 #### Gradle
 
 ```gradle
-compile 'io.ipfs.multiformats:kotlin-multihash:......'
+compile 'io.ipfs.multiformats:kotlin-multihash:1.0.0'
 ```
 
 
@@ -35,7 +35,10 @@ compile 'io.ipfs.multiformats:kotlin-multihash:......'
 
 ```kotlin
 val mh = Multihash.fromBase58(hash)
-......
+val hex = mh.toHex()
+val base32 = mh.toBase32()
+val base58 = mh.toBase58()
+val base64 = mh.toBase64()
 ```
 
 
