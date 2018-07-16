@@ -2,6 +2,7 @@ package io.ipfs.multiformats.multihash
 
 import io.ipfs.multiformats.multibase.BaseN
 import io.ipfs.multiformats.multibase.MultiBase
+import org.apache.commons.codec.binary.Base32
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Hex
 import java.math.BigInteger
@@ -15,7 +16,7 @@ import java.util.*
 class Multihash {
 
     var type: Type
-    var hash: ByteArray  //hex or base58
+    var hash: ByteArray  //hex base32 base58 base64
 
     constructor(multihash: Multihash) : this(multihash.type, multihash.hash)
 
@@ -182,8 +183,12 @@ class Multihash {
         return Hex.encodeHexString(toBytes())
     }
 
+    fun toBase32(): String {
+        return Base32().encodeToString(toBytes())
+    }
+
     fun toBase58(): String {
-        return BaseN.encode(MultiBase.Base.BASE58_FLICKR.alphabet, BigInteger("58"), toBytes())
+        return BaseN.encode(MultiBase.Base.BASE58_BTC.alphabet, BigInteger("58"), toBytes())
     }
 
     fun toBase64(): String {
@@ -196,8 +201,12 @@ class Multihash {
             return Multihash(Hex.decodeHex(hex))
         }
 
+        fun fromBase32(base32: String): Multihash {
+            return Multihash(Base32().decode(base32))
+        }
+
         fun fromBase58(base58: String): Multihash {
-            return Multihash(BaseN.decode(MultiBase.Base.BASE58_FLICKR.alphabet, BigInteger("58"), base58))
+            return Multihash(BaseN.decode(MultiBase.Base.BASE58_BTC.alphabet, BigInteger("58"), base58))
         }
 
         fun fromBase64(base64: String): Multihash {

@@ -16,15 +16,15 @@ sourceCompatibility = 1.8
 
 repositories {
   mavenCentral()
-  jcenter()
-//  maven {
-//    url 'https://dl.bintray.com/changjiashuai/maven'
-//  }
+//  jcenter()
+  maven {
+    url 'https://dl.bintray.com/changjiashuai/maven'
+  }
 }
 
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-  compile 'io.ipfs.multiformats:kotlin-multibase:1.0.0'
+  compile 'io.ipfs.multiformats:kotlin-multibase:1.0.1'
   testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
