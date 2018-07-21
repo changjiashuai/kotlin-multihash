@@ -44,24 +44,4 @@ class VarIntTest {
         val a = VarInt.putUvarint(varint, length.toLong())
         println("a=$a")
     }
-
-    @Test
-    fun varIntExt() {
-        for (test in tests) {
-            val ba = test.toOctets()
-            println(BinaryCodec.toAsciiString(ba))
-//            print("${"0x%x".format(test).padEnd(8)} -> ")
-//            var s = ""
-//            ba.forEach { s += "0x%02x ".format(it) }
-//            println("${s.padEnd(20)} <- ${"0x%x".format(ba.fromOctets())}")
-        }
-    }
-
-    fun unsignedInt(value: Int): Long {
-        return value.toLong() and 0xFFFFFFFF
-    }
-
-    fun unsignedByte(value: Byte): Int {
-        return value.toInt() and 0xFF
-    }
 }
