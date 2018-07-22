@@ -36,12 +36,4 @@ class VarIntTest {
             println("value=$value")
         }
     }
-
-    @Test
-    fun putVarInt() {
-        val length = 320
-        val varint = ByteArray((32 - Integer.numberOfLeadingZeros(length) + 6) / 7)
-        val a = VarInt.putUvarint(varint, length.toLong())
-        println("a=$a")
-    }
 }

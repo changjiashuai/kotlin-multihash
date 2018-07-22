@@ -1,6 +1,5 @@
 package io.ipfs.multiformats.multihash
 
-import java.io.EOFException
 import java.io.IOException
 import java.io.InputStream
 
@@ -10,37 +9,6 @@ import java.io.InputStream
  * Created by CJS on 2018/7/19.
  */
 object VarInt {
-
-    fun readVarint(inputStream: InputStream): Long {
-        var x: Long = 0
-        var s = 0
-        for (i in 0..9) {
-            val b = inputStream.read()
-            if (b == -1)
-                throw EOFException()
-            if (b < 0x80) {
-                if (i > 9 || i == 9 && b > 1) {
-                    throw IllegalStateException("Overflow reading varint" + -(i + 1))
-                }
-                return x or (b.toLong() shl s)
-            }
-            x = x or (b.toLong() and 0x7f shl s)
-            s += 7
-        }
-        throw IllegalStateException("Varint too long!")
-    }
-
-    fun putUvarint(buf: ByteArray, x: Long): ByteArray {
-        var x = x
-        var i = 0
-        while (x >= 0x80) {
-            buf[i] = (x or 0x80).toByte()
-            x = x shr 7
-            i++
-        }
-        buf[i] = x.toByte()
-        return buf
-    }
 
     fun encodeVarint(inp: Int): ByteArray {
         var value = inp
@@ -56,10 +24,10 @@ object VarInt {
             out[i] = byteArrayList[i]
             i--
         }
-        return out.reversedArray()
+        return out
     }
 
-    fun encodeVarint(inp: Long): ByteArray {
+    fun encodeVarintLong(inp: Long): ByteArray {
         var value = inp
         val byteArrayList = ByteArray(10)
         var i = 0
@@ -73,14 +41,14 @@ object VarInt {
             out[i] = byteArrayList[i]
             i--
         }
-        return out.reversedArray()
+        return out
     }
 
-    fun decodeVarInt(src: ByteArray): Long {
-        return decodeVarint(src.reversedArray().inputStream())
+    fun decodeVarInt(src: ByteArray, bitLimit: Int = 64, eofOnStartAllowed: Boolean = false): Pair<Long, Int> {
+        return decodeVarint(src.inputStream(), bitLimit, eofOnStartAllowed)
     }
 
-    fun decodeVarint(inp: InputStream, bitLimit: Int = 32, eofOnStartAllowed: Boolean = false): Long {
+    fun decodeVarint(inp: InputStream, bitLimit: Int = 64, eofOnStartAllowed: Boolean = false): Pair<Long, Int> {
         var result = 0L
         var shift = 0
         var b: Int
@@ -92,17 +60,17 @@ object VarInt {
             // Get 7 bits from next byte
             b = inp.read()
             if (b == -1) {
-                if (eofOnStartAllowed && shift == 0) return -1
+                if (eofOnStartAllowed && shift == 0) return Pair(-1, shift)
                 else throw IOException("Unexpected EOF")
             }
             result = result or (b.toLong() and 0x7FL shl shift)
             shift += 7
         } while (b and 0x80 != 0)
-        return result
+        return Pair(result, shift)
     }
 
     fun decodeSignedVarintInt(inp: InputStream): Int {
-        val raw = decodeVarint(inp, 32).toInt()
+        val raw = decodeVarint(inp, 32).first.toInt()
         val temp = raw shl 31 shr 31 xor raw shr 1
         // This extra step lets us deal with the largest signed values by treating
         // negative results from read unsigned methods as like unsigned values.
@@ -111,7 +79,7 @@ object VarInt {
     }
 
     fun decodeSignedVarintLong(inp: InputStream): Long {
-        val raw = decodeVarint(inp, 64)
+        val raw = decodeVarint(inp, 64).first
         val temp = raw shl 63 shr 63 xor raw shr 1
         // This extra step lets us deal with the largest signed values by treating
         // negative results from read unsigned methods as like unsigned values
