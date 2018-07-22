@@ -18,7 +18,7 @@ Add the relevant dependency to your project:
 <dependency>
   <groupId>io.ipfs.multiformats</groupId>
   <artifactId>kotlin-multihash</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -26,7 +26,7 @@ Add the relevant dependency to your project:
 #### Gradle
 
 ```gradle
-compile 'io.ipfs.multiformats:kotlin-multihash:1.0.1'
+compile 'io.ipfs.multiformats:kotlin-multihash:1.1.0'
 ```
 
 
@@ -34,16 +34,12 @@ compile 'io.ipfs.multiformats:kotlin-multihash:1.0.1'
 
 
 ```kotlin
-  val mh = Multihash.fromBase58(hash)
-  val hex = mh.toHex()
-  val base32 = mh.toBase32()
-  val base58 = mh.toBase58()
-  val base64 = mh.toBase64()
+  val mh = Multihash.fromHexString("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33")
+  val hex = mh.toHexString()
 
-  val b = Multihash.encodeByName("sha1", "0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33")
-  println("encode=" + b.contentToString())
-  val s = Multihash.decode(b)
-  println("decode=$s")
+  val buf = Hex.decodeHex("0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33")
+  val mhBuf = Multihash.encodeByName(buf, "sha1")
+  val mhHex = Hex.encodeHexString(mhBuf)
 ```
 
 
